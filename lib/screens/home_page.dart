@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:music_hour_app/screens/family_details_page.dart';
-import 'package:music_hour_app/screens/user_login_page.dart';
+import 'package:music_hour_app/screens/getmusicpage.dart';
+import 'package:music_hour_app/screens/music_content_page.dart';
+import 'package:music_hour_app/screens/user_access_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
@@ -27,7 +29,7 @@ class HomePage extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('Admin'),
+              child: Text('Admin-Add Family'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -35,14 +37,44 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserLoginPage(
+                    builder: (context) => MusicContentPage(
                       prefs: prefs,
-                      familyId: -1,
+                      familyId: 41,
                     ),
                   ),
                 );
               },
-              child: Text('User'),
+              child: Text('Admin-Add Music'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserAccessPage(
+                      familyId: 33,
+                      prefs: prefs,
+                    ),
+                  ),
+                );
+              },
+              child: Text('User Login'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GetMusicPage(
+                      prefs: prefs,
+                      familyId: 41,
+                    ),
+                  ),
+                );
+              },
+              child: Text('User- Get Music'),
             ),
           ],
         ),

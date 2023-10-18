@@ -44,10 +44,13 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
 
         // Access the family ID
         int familyId = jsonData['family_id'];
-
+        String familyName = jsonData['family_name'];
+        print(familyId);
+        print("printing family id ........");
         // Store familyId and musicHour in SharedPreferences
         await widget.prefs.setInt('family_id', familyId);
         await widget.prefs.setString('music_hour', jsonData['music_hour']);
+        print(widget.prefs.getInt('family_id'));
 
         // Navigate to next screen
         await _fetchFamilyDetails();
@@ -77,24 +80,34 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
         // Convert the response to a JSON object
         var jsonData = jsonDecode(response.body);
 
-        // Access the family ID
-        int familyId = jsonData['family_id'];
+        if (jsonData is List && jsonData.isNotEmpty) {
+          var family = jsonData.last;
+          int familyId = family['family_id'];
 
-        // Store family details in SharedPreferences
-        await widget.prefs.setInt('family_id', familyId);
-        await widget.prefs.setString('family_name', jsonData['family_name']);
-        await widget.prefs.setString('music_hour', jsonData['music_hour']);
+          // Store family details in SharedPreferences
+          await widget.prefs.setInt('family_id', familyId);
+          await widget.prefs.setString('family_name', family['family_name']);
+          await widget.prefs.setString('music_hour', family['music_hour']);
+          print(widget.prefs.getKeys());
+          print(widget.prefs.getInt('family_id'));
+          print(widget.prefs.getString('music_hour'));
+          print(widget.prefs.getString('family_name'));
 
-        // Navigate to next screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminDetailsPage(
-              prefs: widget.prefs,
-              familyId: familyId,
+          // Navigate to next screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminDetailsPage(
+                prefs: widget.prefs,
+                familyId: familyId,
+                musicHour: '',
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          // Handle empty response or invalid format
+          throw Exception('Invalid response format');
+        }
       } else {
         // Handle errors here
         print('Failed to fetch family details');
@@ -115,7 +128,7 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Family Details'),
+        title: Text('Add Family Details'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

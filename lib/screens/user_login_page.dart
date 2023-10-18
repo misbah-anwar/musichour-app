@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:music_hour_app/screens/admin_page.dart';
 import 'dart:convert';
-import 'timer_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserLoginPage extends StatefulWidget {
   final SharedPreferences prefs;
+  final int familyId;
 
   UserLoginPage({
     required this.prefs,
-    required int familyId,
+    required this.familyId,
   });
 
   @override
@@ -17,43 +18,24 @@ class UserLoginPage extends StatefulWidget {
 }
 
 class _UserLoginPageState extends State<UserLoginPage> {
-  int? familyId;
+  int familyId = 0;
   TextEditingController userNameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     // Retrieve family_id from SharedPreferences
-    familyId = widget.prefs.getInt('family_id');
-  }
-
-  Future<String> _fetchMusicHour() async {
-    try {
-      var response = await http.get(
-        Uri.parse(
-            'http://baatcheet1-env.eba-3uzrj2rz.us-east-2.elasticbeanstalk.com/getMusicFamilyByFamilyId/$familyId'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        String musicHour = jsonData['music_hour'];
-        return musicHour;
-      } else {
-        throw Exception('Failed to load music hour');
-      }
-    } catch (error) {
-      print('Error fetching music hour: $error');
-      throw error;
-    }
+    print(widget.prefs.getInt('family_id'));
+    print(".......................");
+    print(widget.prefs.getString('music_hour'));
+    print(".......................");
+    print(widget.prefs.getString('family_name'));
+    print(".......................");
   }
 
   void _submitUserDetails() async {
     try {
-      String musicHour = await _fetchMusicHour();
       var response = await http.post(
         Uri.parse(
           'http://baatcheet1-env.eba-3uzrj2rz.us-east-2.elasticbeanstalk.com/addMusicUserByFamilyName',
@@ -64,7 +46,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
         body: jsonEncode(<String, dynamic>{
           'family_id': familyId,
           'user_name': userNameController.text,
-          'password': passwordController.text,
+          'email': emailController.text,
         }),
       );
 
@@ -73,23 +55,21 @@ class _UserLoginPageState extends State<UserLoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TimerPage(
-              musicHour: musicHour,
-            ),
+            builder: (context) => AdminPage(familyId: 33, prefs: widget.prefs),
           ),
         );
       } else {
         print('Failed to submit User Details');
       }
     } catch (error) {
-      print('Error fetching music hour: $error');
+      print('Error submitting user details: $error');
     }
   }
 
   void _cancel() {
     setState(() {
       userNameController.clear();
-      passwordController.clear();
+      emailController.clear();
     });
   }
 
@@ -97,7 +77,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Details'),
+        title: Text('Add User Details'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -108,9 +88,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
               decoration: InputDecoration(labelText: 'User Name'),
             ),
             TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email Id'),
             ),
             SizedBox(height: 20),
             Row(

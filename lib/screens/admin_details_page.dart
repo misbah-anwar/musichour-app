@@ -11,6 +11,7 @@ class AdminDetailsPage extends StatefulWidget {
   AdminDetailsPage({
     required this.prefs,
     required this.familyId,
+    required String musicHour,
   });
 
   @override
@@ -42,16 +43,13 @@ class _AdminDetailsPageState extends State<AdminDetailsPage> {
       if (response.statusCode == 200) {
         print('Admin Details submitted successfully');
 
-        // Fetch and store all details in SharedPreferences
-        await _fetchAndStoreAllDetails();
-
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AdminPage(
               familyId: widget.familyId,
               prefs: widget.prefs,
-              musicHourFuture: fetchMusicHour(),
+              //musicHourFuture: fetchMusicHour(),
             ),
           ),
         );
@@ -60,31 +58,6 @@ class _AdminDetailsPageState extends State<AdminDetailsPage> {
       }
     } catch (error) {
       print('Error fetching music hour: $error');
-    }
-  }
-
-  Future<void> _fetchAndStoreAllDetails() async {
-    try {
-      var response = await http.get(
-        Uri.parse(
-          'http://baatcheet1-env.eba-3uzrj2rz.us-east-2.elasticbeanstalk.com/getMusicUsers',
-        ),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-
-        // Store all details in SharedPreferences
-        await widget.prefs.setString('user_details', jsonEncode(jsonData));
-      } else {
-        throw Exception('Failed to load user details');
-      }
-    } catch (error) {
-      print('Error fetching user details: $error');
-      throw error;
     }
   }
 
@@ -101,9 +74,12 @@ class _AdminDetailsPageState extends State<AdminDetailsPage> {
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
-        int familyId = jsonData['family_id'];
-
-        return fetchMusicHourByFamilyId(familyId);
+        if (jsonData is List && jsonData.isNotEmpty) {
+          return jsonData[0]
+              ['music_hour']; // Access 'music_hour' directly from the response
+        } else {
+          throw Exception('Invalid response format');
+        }
       } else {
         throw Exception('Failed to load music hour');
       }
@@ -149,7 +125,7 @@ class _AdminDetailsPageState extends State<AdminDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Details'),
+        title: Text('Add Admin Details'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

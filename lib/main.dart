@@ -11,20 +11,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // Fetch the family_id
-  int familyId = await fetchFamilyId();
-
-  // Store the family_id in SharedPreferences
-  prefs.setInt('family_id', familyId);
-
-  runApp(MyApp(prefs: prefs, familyId: familyId));
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
-  final int familyId;
 
-  MyApp({required this.prefs, required this.familyId});
+  MyApp({required this.prefs});
 
   @override
   Widget build(BuildContext context) {
@@ -39,33 +32,37 @@ class MyApp extends StatelessWidget {
         '/admin': (context) => FamilyDetailsPage(prefs: prefs),
         '/user': (context) => UserLoginPage(
               prefs: prefs,
-              familyId: familyId,
+              familyId: 33,
             ),
-        '/timer': (context) => TimerPage(musicHour: ''),
+        '/timer': (context) => TimerPage(
+              musicHour: '',
+              prefs: prefs,
+              familyId: 33,
+            ),
       },
     );
   }
 }
 
-Future<int> fetchFamilyId() async {
-  try {
-    var response = await http.get(
-      Uri.parse(
-          'http://baatcheet1-env.eba-3uzrj2rz.us-east-2.elasticbeanstalk.com/getMusicFamilies'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+// Future<int> fetchFamilyId() async {
+//   try {
+//     var response = await http.get(
+//       Uri.parse(
+//           'http://baatcheet1-env.eba-3uzrj2rz.us-east-2.elasticbeanstalk.com/getMusicFamilies'),
+//       headers: <String, String>{
+//         'Content-Type': 'application/json; charset=UTF-8',
+//       },
+//     );
 
-    if (response.statusCode == 200) {
-      var jsonData = jsonDecode(response.body);
-      return jsonData[0][
-          'family_id']; // Assuming family_id is in the first element of the response
-    } else {
-      throw Exception('Failed to load family_id');
-    }
-  } catch (error) {
-    print('Error fetching family_id: $error');
-    throw error;
-  }
-}
+//     if (response.statusCode == 200) {
+//       var jsonData = jsonDecode(response.body);
+//       return jsonData[0][
+//           'family_id']; // Assuming family_id is in the first element of the response
+//     } else {
+//       throw Exception('Failed to load family_id');
+//     }
+//   } catch (error) {
+//     print('Error fetching family_id: $error');
+//     throw error;
+//   }
+// }

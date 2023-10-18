@@ -6,12 +6,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AdminPage extends StatelessWidget {
   final int familyId;
   final SharedPreferences prefs;
-  final Future<String> musicHourFuture;
+  //final Future<String> musicHourFuture;
 
   AdminPage({
     required this.familyId,
     required this.prefs,
-    required this.musicHourFuture,
+    //required this.musicHourFuture,
   });
 
   @override
@@ -30,8 +30,8 @@ class AdminPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => UserLoginPage(
-                      familyId: familyId,
                       prefs: prefs,
+                      familyId: 33,
                     ),
                   ),
                 );
@@ -46,6 +46,7 @@ class AdminPage extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => MusicContentPage(
                       familyId: familyId,
+                      prefs: prefs,
                     ),
                   ),
                 );

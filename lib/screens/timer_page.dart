@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerPage extends StatefulWidget {
-  final String musicHour;
+  final SharedPreferences prefs;
 
-  TimerPage({required this.musicHour});
+  TimerPage(
+      {required this.prefs, required String musicHour, required int familyId});
 
   @override
   _TimerPageState createState() => _TimerPageState();
@@ -21,23 +23,20 @@ class _TimerPageState extends State<TimerPage> {
   void initState() {
     super.initState();
 
-    // Initialize timezone data
     tz.initializeTimeZones();
 
-    // Get the music hour from widget property
-    musicHourTime = getUtcTime(widget.musicHour);
+    String musicHour = widget.prefs.getString('music_hour') ?? '';
+    musicHourTime = getUtcTime(musicHour);
 
-    // Initialize remainingTime
     remainingTime = timeRemaining(musicHourTime);
 
-    // Initialize the timer and set it to update every second
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         remainingTime = timeRemaining(musicHourTime);
       });
 
       if (remainingTime.inSeconds <= 0) {
-        timer.cancel(); // Stop the timer when the music hour starts
+        timer.cancel();
       }
     });
   }
@@ -45,7 +44,7 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void dispose() {
     super.dispose();
-    timer.cancel(); // Cancel the timer when the widget is disposed
+    timer.cancel();
   }
 
   String formatTime(Duration duration) {
