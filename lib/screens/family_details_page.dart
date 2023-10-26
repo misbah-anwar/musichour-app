@@ -16,7 +16,7 @@ class FamilyDetailsPage extends StatefulWidget {
 class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
   TextEditingController familyNameController = TextEditingController();
   TextEditingController musicHourController = TextEditingController();
-
+  int? statusCode;
   Future<void> _submitFamilyDetails() async {
     try {
       var response = await http.post(
@@ -30,6 +30,9 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
           'music_hour': musicHourController.text,
         }),
       );
+      setState(() {
+        statusCode = response.statusCode; // Update status code variable
+      });
 
       if (response.statusCode == 200) {
         // Successful submission
@@ -44,12 +47,13 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
 
         // Access the family ID
         int familyId = jsonData['family_id'];
-        String familyName = jsonData['family_name'];
+        //String familyName = jsonData['family_name'];
         print(familyId);
         print("printing family id ........");
         // Store familyId and musicHour in SharedPreferences
         await widget.prefs.setInt('family_id', familyId);
         await widget.prefs.setString('music_hour', jsonData['music_hour']);
+        await widget.prefs.setString('family_name', jsonData['family_name']);
         print(widget.prefs.getInt('family_id'));
 
         // Navigate to next screen
@@ -143,6 +147,11 @@ class _FamilyDetailsPageState extends State<FamilyDetailsPage> {
               decoration: InputDecoration(labelText: 'Music Hour (HH:mm)'),
             ),
             SizedBox(height: 20),
+            if (statusCode != null)
+              Text(
+                'Status Code: $statusCode',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[

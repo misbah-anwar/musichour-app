@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:music_hour_app/screens/home_page.dart';
 import 'package:music_hour_app/screens/family_details_page.dart';
@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Music Hour App',
       theme: ThemeData(
         primarySwatch: Colors.blue,

@@ -4,13 +4,22 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MusicContentPage extends StatelessWidget {
+class MusicContentPage extends StatefulWidget {
   final int familyId;
   final SharedPreferences prefs;
 
   MusicContentPage({required this.familyId, required this.prefs});
 
-  Future<void> _addMusicContent(String content) async {
+  @override
+  _MusicContentPageState createState() => _MusicContentPageState();
+}
+
+class _MusicContentPageState extends State<MusicContentPage> {
+  TextEditingController musicUrlController = TextEditingController();
+  TextEditingController familyNameController = TextEditingController();
+  int? statusCode;
+
+  Future<void> _addMusicContent() async {
     try {
       var response = await http.post(
         Uri.parse(
@@ -21,18 +30,41 @@ class MusicContentPage extends StatelessWidget {
         },
         body: jsonEncode(<String, dynamic>{
           //'family_name': family,
-          'music_url': content,
+          'music_url': musicUrlController.text,
+          'family_name': familyNameController.text,
         }),
       );
+      setState(() {
+        statusCode = response.statusCode; // Update status code variable
+      });
 
       if (response.statusCode == 200) {
         print('Music content added successfully');
+        print(response.statusCode);
+        String responseBody = response.body;
+        print('Response body: $responseBody');
+        //String responseBody = response.body;
+        //print('Response body: $responseBody');
+        var jsonData = jsonDecode(responseBody);
+        String musicurl = jsonData['music_url'];
+        print(musicurl);
+        print("printing music url ........");
+        // Store musicurl in SharedPreferences
+        // await widget.prefs.setString('music_url', jsonData['music_url']);
+        // print(widget.prefs.getString('music_url'));
       } else {
         print('Failed to add music content');
       }
     } catch (error) {
       print('Error adding music content: $error');
     }
+  }
+
+  void _cancel() {
+    setState(() {
+      musicUrlController.clear();
+      familyNameController.clear();
+    });
   }
 
   @override
@@ -46,18 +78,26 @@ class MusicContentPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextField(
-              onChanged: (content) {
-                // Update content as user types
-              },
+              controller: musicUrlController,
               decoration: InputDecoration(labelText: 'Music Content'),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Pass the content to the function when button is pressed
-                _addMusicContent('music_url');
-              },
-              child: Text('Add Music Content'),
+            TextField(
+              controller: familyNameController,
+              decoration: InputDecoration(labelText: 'Family Name'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _addMusicContent,
+                  child: Text('Submit'),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _cancel,
+                  child: Text('Cancel'),
+                ),
+              ],
             ),
           ],
         ),

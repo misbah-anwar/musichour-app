@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music_hour_app/screens/getmusicpage.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:async';
@@ -6,9 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TimerPage extends StatefulWidget {
   final SharedPreferences prefs;
+  final int familyId;
 
   TimerPage(
-      {required this.prefs, required String musicHour, required int familyId});
+      {required this.prefs, required this.familyId, required String musicHour});
 
   @override
   _TimerPageState createState() => _TimerPageState();
@@ -37,8 +39,19 @@ class _TimerPageState extends State<TimerPage> {
 
       if (remainingTime.inSeconds <= 0) {
         timer.cancel();
+        _navigateToGetMusicPage();
       }
     });
+  }
+
+  void _navigateToGetMusicPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            GetMusicPage(prefs: widget.prefs, familyId: widget.familyId),
+      ),
+    );
   }
 
   @override

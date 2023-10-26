@@ -16,6 +16,7 @@ class GetMusicPage extends StatefulWidget {
 
 class _GetMusicPageState extends State<GetMusicPage> {
   late Future<String> videoUrl;
+  int itemAvailable = 1;
 
   @override
   void initState() {
@@ -34,10 +35,12 @@ class _GetMusicPageState extends State<GetMusicPage> {
 
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body);
+      print("response:" + response.body);
+
       if (jsonData is List && jsonData.isNotEmpty) {
-        var firstItem = jsonData.first;
-        if (firstItem.containsKey('music_url')) {
-          return firstItem['music_url'];
+        var currentItem = jsonData[2];
+        if (currentItem.containsKey('music_url')) {
+          return currentItem['music_url'];
         } else {
           throw Exception('music_url not found in response');
         }
@@ -45,6 +48,7 @@ class _GetMusicPageState extends State<GetMusicPage> {
         throw Exception('Empty or invalid response from the API');
       }
     } else {
+      itemAvailable = 0;
       throw Exception('Failed to load video URL');
     }
   }
@@ -64,17 +68,26 @@ class _GetMusicPageState extends State<GetMusicPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             print('Video URL received: ${snapshot.data}');
-            return Center(
-              child: YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: YoutubePlayer.convertUrlToId(snapshot.data!)!,
-                  flags: YoutubePlayerFlags(
-                    autoPlay: true,
-                    mute: false,
-                  ),
+            return Container(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    YoutubePlayer(
+                      controller: YoutubePlayerController(
+                        initialVideoId:
+                            YoutubePlayer.convertUrlToId(snapshot.data!)!,
+                        flags: YoutubePlayerFlags(
+                          autoPlay: true,
+                          mute: false,
+                        ),
+                      ),
+                      showVideoProgressIndicator: true,
+                      progressIndicatorColor: Colors.blueAccent,
+                    ),
+                    Text("flag")
+                  ],
                 ),
-                showVideoProgressIndicator: true,
-                progressIndicatorColor: Colors.blueAccent,
               ),
             );
           }
