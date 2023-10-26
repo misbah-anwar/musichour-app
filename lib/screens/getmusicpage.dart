@@ -8,7 +8,10 @@ class GetMusicPage extends StatefulWidget {
   final SharedPreferences prefs;
   final int familyId;
 
-  GetMusicPage({required this.prefs, required this.familyId});
+  GetMusicPage({
+    required this.prefs,
+    required this.familyId,
+  });
 
   @override
   _GetMusicPageState createState() => _GetMusicPageState();
@@ -17,6 +20,10 @@ class GetMusicPage extends StatefulWidget {
 class _GetMusicPageState extends State<GetMusicPage> {
   late Future<String> videoUrl;
   int itemAvailable = 1;
+  int count = 0;
+  int position = 0;
+
+  late YoutubePlayerController _controller;
 
   @override
   void initState() {
@@ -34,11 +41,11 @@ class _GetMusicPageState extends State<GetMusicPage> {
     );
 
     if (response.statusCode == 200) {
-      var jsonData = jsonDecode(response.body);
-      print("response:" + response.body);
+      List jsonData = jsonDecode(response.body);
+      count = jsonData.length;
 
       if (jsonData is List && jsonData.isNotEmpty) {
-        var currentItem = jsonData[2];
+        var currentItem = jsonData[position];
         if (currentItem.containsKey('music_url')) {
           return currentItem['music_url'];
         } else {
@@ -67,25 +74,32 @@ class _GetMusicPageState extends State<GetMusicPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            print('Video URL received: ${snapshot.data}');
+            _controller = YoutubePlayerController(
+              initialVideoId: YoutubePlayer.convertUrlToId(snapshot.data!)!,
+              flags: YoutubePlayerFlags(
+                autoPlay: true,
+                mute: false,
+              ),
+            );
+
             return Container(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     YoutubePlayer(
-                      controller: YoutubePlayerController(
-                        initialVideoId:
-                            YoutubePlayer.convertUrlToId(snapshot.data!)!,
-                        flags: YoutubePlayerFlags(
-                          autoPlay: true,
-                          mute: false,
-                        ),
-                      ),
+                      controller: _controller,
                       showVideoProgressIndicator: true,
                       progressIndicatorColor: Colors.blueAccent,
                     ),
-                    Text("flag")
+                    Text(
+                      'Remaining Time: ${(_controller.metadata.duration.inMinutes - _controller.value.position.inMinutes)}',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Text("playing item " +
+                        (position + 1).toString() +
+                        " of " +
+                        count.toString())
                   ],
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:music_hour_app/screens/getmusicpage.dart';
 import 'package:music_hour_app/screens/music_content_page.dart';
 import 'package:music_hour_app/screens/user_access_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class HomePage extends StatelessWidget {
   final SharedPreferences prefs;
@@ -67,10 +68,8 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GetMusicPage(
-                      prefs: prefs,
-                      familyId: 41,
-                    ),
+                    builder: (context) =>
+                        GetMusicPage(prefs: prefs, familyId: 41),
                   ),
                 );
               },
