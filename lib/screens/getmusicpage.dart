@@ -45,6 +45,8 @@ class _GetMusicPageState extends State<GetMusicPage> {
       count = jsonData.length;
 
       if (jsonData is List && jsonData.isNotEmpty) {
+        print("controller:");
+        print(_controller.metadata.duration.inMilliseconds);
         var currentItem = jsonData[position];
         if (currentItem.containsKey('music_url')) {
           return currentItem['music_url'];
@@ -93,7 +95,7 @@ class _GetMusicPageState extends State<GetMusicPage> {
                       progressIndicatorColor: Colors.blueAccent,
                     ),
                     Text(
-                      'Remaining Time: ${(_controller.metadata.duration.inMinutes - _controller.value.position.inMinutes)}',
+                      'Remaining Time: ${(_controller.metadata.duration.inMilliseconds)}',
                       style: TextStyle(fontSize: 16),
                     ),
                     Text("playing item " +
